@@ -1,7 +1,6 @@
 package org.tamal.spring.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +18,12 @@ public class PersonController {
 
     @GetMapping("/persons")
     @ResponseBody
-    private List<Person> getAllPersons() {
-        return personService.getAllPersons();
+    private List<Person> getPersons(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam("sort") List<String> sorts,
+            @RequestParam("direction") String direction) {
+        return personService.getPersons(page, size, sorts, direction);
     }
 
     @GetMapping("/persons/{id}")

@@ -1,7 +1,7 @@
 package org.tamal.spring.model;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 public class Person {
@@ -14,7 +14,7 @@ public class Person {
     private String name;
 
     @Column(nullable = false)
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Column(nullable = false, length = 1)
     private char sex;
@@ -35,11 +35,11 @@ public class Person {
         this.name = name;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
