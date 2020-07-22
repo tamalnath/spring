@@ -1,6 +1,7 @@
 package org.tamal.spring.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +19,11 @@ public class PersonController {
 
     @GetMapping("/persons")
     @ResponseBody
-    private List<Person> getPersons(
-            @RequestParam("page") int page,
-            @RequestParam("size") int size,
-            @RequestParam("sort") List<String> sorts,
-            @RequestParam("direction") String direction) {
+    private Page<Person> getPersons(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sort", defaultValue = "") List<String> sorts,
+            @RequestParam(value = "direction", defaultValue = "asc") String direction) {
         return personService.getPersons(page, size, sorts, direction);
     }
 
