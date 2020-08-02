@@ -19,6 +19,15 @@ public class Person {
     @Column(nullable = false, length = 1)
     private char sex;
 
+    @Column(nullable = false, length = 64, unique = true)
+    private String email;
+
+    @Column(nullable = false, length = 15, unique = true)
+    private String phone;
+
+    @Column
+    private String address;
+
     public int getId() {
         return id;
     }
@@ -49,6 +58,30 @@ public class Person {
 
     public void setSex(char sex) {
         this.sex = sex;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
 }

@@ -1,1 +1,0 @@
-insert into person (NAME, DATE_OF_BIRTH, SEX) values ('Tamal', '1984-10-26', 'M')

@@ -18,14 +18,8 @@ public class PersonService {
     @Autowired
     private PersonRepository personRepository;
 
-    public Page<Person> getPersons(int page, int size, List<String> orders, String direction) {
-        if (page < 0 || size <= 0) {
-            return personRepository.findAll(Pageable.unpaged());
-        }
-        Sort.Direction dir = Sort.Direction.fromOptionalString(direction).orElse(Sort.Direction.ASC);
-        Sort sort = (orders == null || orders.isEmpty()) ? Sort.unsorted() : Sort.by(dir, orders.toArray(new String[0]));
-        PageRequest pageRequest = PageRequest.of(page, size, sort);
-        return personRepository.findAll(pageRequest);
+    public Page<Person> getPersons(Pageable pageable) {
+        return personRepository.findAll(pageable);
     }
 
     public Optional<Person> getPerson(int id) {
