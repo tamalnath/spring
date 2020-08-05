@@ -1,6 +1,11 @@
 package org.tamal.spring.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 @Entity
@@ -22,8 +27,8 @@ public class Person {
     @Column(nullable = false, length = 64, unique = true)
     private String email;
 
-    @Column(nullable = false, length = 15, unique = true)
-    private String phone;
+    @Column(nullable = false, precision = 10, scale = 0, unique = true)
+    private BigInteger phone;
 
     @Column
     private String address;
@@ -68,11 +73,11 @@ public class Person {
         this.email = email;
     }
 
-    public String getPhone() {
+    public BigInteger getPhone() {
         return phone;
     }
 
-    public void setPhone(String phone) {
+    public void setPhone(BigInteger phone) {
         this.phone = phone;
     }
 

@@ -17,6 +17,6 @@ class PersonTest {
 
     @Test
     void testGetPersonsWithoutPageAndOrder() {
-        assertNotNull(personService.getPersons(Pageable.unpaged()));
+        assertNotNull(personService.getPersons(null, Pageable.unpaged()));
     }
 }
