@@ -18,8 +18,8 @@ import org.springframework.web.server.ResponseStatusException;
 import org.tamal.spring.model.Person;
 import org.tamal.spring.service.PersonService;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Controller
 public class PersonController {
@@ -30,29 +30,31 @@ public class PersonController {
     /**
      * Lists all the persons.
      * @param pageable the pagination and sorting parameters
-     * @param name the name to search (accepts SQL like operator)
+     * @param nameLike the name to search (accepts SQL like operator)
      * @param olderThan filter by date of birth older than the given date
      * @param youngerThan filter by date of birth younger than the given date
-     * @param sex filter by sex ('M' or 'F')
+     * @param gender filter by sex ('M' or 'F')
      * @param email search by email address
      * @param phone search by phone number
-     * @param address search by address (accepts SQL like operator)
+     * @param addressLike search by address (accepts SQL like operator)
      * @return persons matching the search criteria
      */
     @GetMapping("/persons")
     @ResponseBody
     private Page<Person> getPersons(Pageable pageable,
-                                    @RequestParam(value = "name", required = false) String name,
-                                    @RequestParam(value = "olderThan", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate olderThan,
-                                    @RequestParam(value = "youngerThan", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate youngerThan,
-                                    @RequestParam(value = "sex", required = false) Character sex,
+                                    @RequestParam(value = "name-like", required = false) String nameLike,
+                                    @RequestParam(value = "older-than", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate olderThan,
+                                    @RequestParam(value = "younger-than", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate youngerThan,
+                                    @RequestParam(value = "gender", required = false) Character gender,
                                     @RequestParam(value = "email", required = false) String email,
-                                    @RequestParam(value = "phone", required = false) BigInteger phone,
-                                    @RequestParam(value = "address", required = false) String address) {
+                                    @RequestParam(value = "phone", required = false) String phone,
+                                    @RequestParam(value = "address-like", required = false) String addressLike) {
         Specification<Person> specification = Specification.where(null);
-        if (name != null) {
-            specification = specification.and((root, query, builder) -> builder.like(root.get("name"), name));
+        if (nameLike != null) {
+            Objects.requireNonNull(specification);
+            specification = specification.and((root, query, builder) -> builder.like(root.get("name"), "%" + nameLike + "%"));
         }
+        Objects.requireNonNull(specification);
         if (olderThan != null && youngerThan != null) {
             specification = specification.and((root, query, builder) -> builder.between(root.get("dateOfBirth"), olderThan, youngerThan));
         } else if (olderThan != null) {
@@ -60,17 +62,33 @@ public class PersonController {
         } else if (youngerThan != null) {
             specification = specification.and((root, query, builder) -> builder.lessThanOrEqualTo(root.get("dateOfBirth"), youngerThan));
         }
-        if (sex != null) {
-            specification = specification.and((root, query, builder) -> builder.equal(root.get("sex"), Character.toUpperCase(sex)));
+        if (gender != null) {
+            Objects.requireNonNull(specification);
+            specification = specification.and((root, query, builder) -> builder.equal(root.get("gender"), Character.toUpperCase(gender)));
         }
         if (email != null) {
-            specification = specification.and((root, query, builder) -> builder.equal(root.get("email"), email));
+            Objects.requireNonNull(specification);
+            if (email.isEmpty()) {
+                specification = specification.and((root, query, builder) -> builder.isNull(root.get("email")));
+            } else {
+                specification = specification.and((root, query, builder) -> builder.equal(root.get("email"), email.toLowerCase()));
+            }
         }
         if (phone != null) {
-            specification = specification.and((root, query, builder) -> builder.equal(root.get("phone"), phone));
+            Objects.requireNonNull(specification);
+            if (phone.isEmpty()) {
+                specification = specification.and((root, query, builder) -> builder.isNull(root.get("phone")));
+            } else {
+                specification = specification.and((root, query, builder) -> builder.equal(root.get("phone"), phone));
+            }
         }
-        if (address != null) {
-            specification = specification.and((root, query, builder) -> builder.like(root.get("address"), address));
+        if (addressLike != null) {
+            Objects.requireNonNull(specification);
+            if (addressLike.isEmpty()) {
+                specification = specification.and((root, query, builder) -> builder.isNull(root.get("address")));
+            } else {
+                specification = specification.and((root, query, builder) -> builder.like(root.get("address"), "%" + addressLike + "%"));
+            }
         }
         return personService.getPersons(specification, pageable);
     }
