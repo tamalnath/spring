@@ -38,7 +38,7 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- for api documentation, browse http://localhost/swagger-ui -->
+        <!-- for api documentation, browse http://localhost/swagger-ui.html -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
