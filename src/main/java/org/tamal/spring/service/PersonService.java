@@ -24,8 +24,8 @@ public class PersonService {
         return personRepository.findById(id);
     }
 
-    public void saveOrUpdate(Person person) {
-        personRepository.save(person);
+    public Person save(Person person) {
+        return personRepository.save(person);
     }
 
     public void delete(int id) {

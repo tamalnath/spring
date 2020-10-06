@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 @Entity
@@ -12,12 +13,12 @@ public class Person {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(nullable = false, length = 32)
     private String name;
 
-    @Column(nullable = false)
+    @Column
     private LocalDate dateOfBirth;
 
     @Column(nullable = false, length = 1)
@@ -26,17 +27,18 @@ public class Person {
     @Column(length = 64, unique = true)
     private String email;
 
-    @Column(length = 16, unique = true)
-    private String phone;
+    @Column(precision = 10, unique = true)
+    private BigInteger phone;
 
     @Column
     private String address;
 
-    public int getId() {
+    
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -72,11 +74,11 @@ public class Person {
         this.email = email;
     }
 
-    public String getPhone() {
+    public BigInteger getPhone() {
         return phone;
     }
 
-    public void setPhone(String phone) {
+    public void setPhone(BigInteger phone) {
         this.phone = phone;
     }
 

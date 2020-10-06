@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,12 +13,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.server.ResponseStatusException;
 import org.tamal.spring.model.Person;
 import org.tamal.spring.service.PersonService;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Optional;
 
 @Controller
 public class PersonController {
@@ -30,29 +30,29 @@ public class PersonController {
     /**
      * Lists all the persons.
      * @param pageable the pagination and sorting parameters
-     * @param nameLike the name to search (accepts SQL like operator)
+     * @param name the name to search (accepts SQL like operator)
      * @param olderThan filter by date of birth older than the given date
      * @param youngerThan filter by date of birth younger than the given date
      * @param gender filter by sex ('M' or 'F')
      * @param email search by email address
      * @param phone search by phone number
-     * @param addressLike search by address (accepts SQL like operator)
+     * @param address search by address (accepts SQL like operator)
      * @return persons matching the search criteria
      */
     @GetMapping("/persons")
     @ResponseBody
-    private Page<Person> getPersons(Pageable pageable,
-                                    @RequestParam(value = "name-like", required = false) String nameLike,
+    public Page<Person> getPersons(Pageable pageable,
+                                    @RequestParam(value = "name", required = false) String name,
                                     @RequestParam(value = "older-than", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate olderThan,
                                     @RequestParam(value = "younger-than", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate youngerThan,
                                     @RequestParam(value = "gender", required = false) Character gender,
                                     @RequestParam(value = "email", required = false) String email,
                                     @RequestParam(value = "phone", required = false) String phone,
-                                    @RequestParam(value = "address-like", required = false) String addressLike) {
+                                    @RequestParam(value = "address", required = false) String address) {
         Specification<Person> specification = Specification.where(null);
-        if (nameLike != null) {
+        if (name != null) {
             Objects.requireNonNull(specification);
-            specification = specification.and((root, query, builder) -> builder.like(root.get("name"), "%" + nameLike + "%"));
+            specification = specification.and((root, query, builder) -> builder.like(root.get("name"), name));
         }
         Objects.requireNonNull(specification);
         if (olderThan != null && youngerThan != null) {
@@ -79,15 +79,15 @@ public class PersonController {
             if (phone.isEmpty()) {
                 specification = specification.and((root, query, builder) -> builder.isNull(root.get("phone")));
             } else {
-                specification = specification.and((root, query, builder) -> builder.equal(root.get("phone"), phone));
+                specification = specification.and((root, query, builder) -> builder.equal(root.get("phone"), new BigInteger(phone)));
             }
         }
-        if (addressLike != null) {
+        if (address != null) {
             Objects.requireNonNull(specification);
-            if (addressLike.isEmpty()) {
+            if (address.isEmpty()) {
                 specification = specification.and((root, query, builder) -> builder.isNull(root.get("address")));
             } else {
-                specification = specification.and((root, query, builder) -> builder.like(root.get("address"), "%" + addressLike + "%"));
+                specification = specification.and((root, query, builder) -> builder.like(root.get("address"), address));
             }
         }
         return personService.getPersons(specification, pageable);
@@ -95,8 +95,8 @@ public class PersonController {
 
     @GetMapping("/persons/{id}")
     @ResponseBody
-    private Person getPerson(@PathVariable("id") int id) {
-        return personService.getPerson(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    private Optional<Person> getPerson(@PathVariable("id") int id) {
+        return personService.getPerson(id);
     }
 
     @DeleteMapping("/persons/{id}")
@@ -106,9 +106,8 @@ public class PersonController {
 
     @PostMapping("/persons")
     @ResponseBody
-    private int savePerson(@RequestBody Person person) {
-        personService.saveOrUpdate(person);
-        return person.getId();
+    private Person savePerson(@RequestBody Person person) {
+        return personService.save(person);
     }
 
 }
